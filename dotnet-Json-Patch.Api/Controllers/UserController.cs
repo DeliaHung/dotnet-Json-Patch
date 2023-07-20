@@ -86,16 +86,7 @@ namespace dotnet_Json_Patch.Api.Controllers
                 LastName = "pung chun"
             };
 
-            if (string.IsNullOrWhiteSpace(command.FirstName) == false)
-            {
-                user.FirstName = command.FirstName;
-            }
-
-            if (string.IsNullOrWhiteSpace(command.LastName) == false)
-            {
-                user.LastName = command.LastName;
-            }
-
+            command.ApplyTo(user);
 
             return Ok(user);
         }

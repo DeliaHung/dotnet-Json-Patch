@@ -15,8 +15,8 @@ namespace dotnet_Json_Patch.Api.Controllers
             _logger = logger;
         }
 
-        [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetUserById(int id)
+        [HttpPatch("")]
+        public async Task<IActionResult> CommonPatch(UpdateUserCommand command)
         {
             User user = new()
             {
@@ -28,64 +28,29 @@ namespace dotnet_Json_Patch.Api.Controllers
                 FirstName = "hung",
                 LastName = "pung chun"
             };
+
+            if (string.IsNullOrWhiteSpace(command.FirstName) == false)
+            {
+                user.FirstName = command.FirstName;
+            }
+
+            if (string.IsNullOrWhiteSpace(command.LastName) == false)
+            {
+                user.LastName = command.LastName;
+            }
+
+
             return Ok(user);
         }
 
-
-        [HttpPost()]
-        public async Task<IActionResult> CreateUser(User user)
+        [HttpPatch("{id:int}")]
+        public IActionResult JsonPatch([FromRoute] int id ,[FromBody] JsonPatchDocument<User> command)
         {
-            return Ok();
-        }
+            User? user = FackUserRepository.GetUserById(id);
 
-        [HttpPut("{id:guid}")]
-        public async Task<IActionResult> UpdateUserInfo(User user)
-        {
-            return Ok();
-        }
-
-        //[HttpPatch()]
-        //public async Task<IActionResult> CommonPatch(UpdateUserCommand command)
-        //{
-        //    User user = new()
-        //    {
-        //        Id = 1,
-        //        Email = "pingchun.hung@gmail.com",
-        //        Account = "delia",
-        //        Password = "123",
-        //        Birthday = new DateTime(1996, 03, 31),
-        //        FirstName = "hung",
-        //        LastName = "pung chun"
-        //    };
-
-        //    if (string.IsNullOrWhiteSpace(command.FirstName) == false)
-        //    {
-        //        user.FirstName = command.FirstName;
-        //    }
-
-        //    if (string.IsNullOrWhiteSpace(command.LastName) == false)
-        //    {
-        //        user.LastName = command.LastName;
-        //    }
-
-
-        //    return Ok(user);
-        //}
-
-        [HttpPatch("{id:guid}")]
-        public async Task<IActionResult> JsonPatch([FromBody] JsonPatchDocument<UpdateUserCommand> command)
-        {
-            User user = new()
-            {
-                Id = 1,
-                Email = "pingchun.hung@gmail.com",
-                Account = "delia",
-                Password = "123",
-                Birthday = new DateTime(1996, 03, 31),
-                FirstName = "hung",
-                LastName = "pung chun"
-            };
-
+            if (user == null)
+                return NoContent();
+            
             command.ApplyTo(user);
 
             return Ok(user);
